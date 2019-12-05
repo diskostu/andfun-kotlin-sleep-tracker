@@ -107,6 +107,7 @@ class SleepDatabaseTest {
         }
     }
 
+
     @Test
     fun updateAndGetNight() {
         sleepDao.insert(SleepNight(sleepQuality = 3))
@@ -119,5 +120,18 @@ class SleepDatabaseTest {
             tonight.sleepQuality = 0
             assertEquals(0, tonight.sleepQuality)
         }
+    }
+
+
+    @Test
+    fun clearAndGet() {
+        val night = SleepNight()
+        sleepDao.insert(night)
+        var tonight = sleepDao.getTonight()
+        assertNotNull(tonight)
+
+        sleepDao.clear()
+        tonight = sleepDao.getTonight()
+        assertNull(tonight)
     }
 }
