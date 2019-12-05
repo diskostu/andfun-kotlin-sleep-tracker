@@ -20,57 +20,104 @@ package com.example.android.trackmysleepquality
 
 // TODO (08) Optional: Add tests to exercise the other DAO methods.
 
-//import androidx.room.Room
-//import androidx.test.ext.junit.runners.AndroidJUnit4
-//import androidx.test.platform.app.InstrumentationRegistry
-//import com.example.android.trackmysleepquality.database.SleepDatabase
-//import com.example.android.trackmysleepquality.database.SleepDatabaseDao
-//import com.example.android.trackmysleepquality.database.SleepNight
-//import org.junit.Assert.assertEquals
-//import org.junit.After
-//import org.junit.Before
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import java.io.IOException
-//
-///**
-// * This is not meant to be a full set of tests. For simplicity, most of your samples do not
-// * include tests. However, when building the Room, it is helpful to make sure it works before
-// * adding the UI.
-// */
-//
-//@RunWith(AndroidJUnit4::class)
-//class SleepDatabaseTest {
-//
-//    private lateinit var sleepDao: SleepDatabaseDao
-//    private lateinit var db: SleepDatabase
-//
-//    @Before
-//    fun createDb() {
-//        val context = InstrumentationRegistry.getInstrumentation().targetContext
-//        // Using an in-memory database because the information stored here disappears when the
-//        // process is killed.
-//        db = Room.inMemoryDatabaseBuilder(context, SleepDatabase::class.java)
-//                // Allowing main thread queries, just for testing.
-//                .allowMainThreadQueries()
-//                .build()
-//        sleepDao = db.sleepDatabaseDao
-//    }
-//
-//    @After
-//    @Throws(IOException::class)
-//    fun closeDb() {
-//        db.close()
-//    }
-//
-//    @Test
-//    @Throws(Exception::class)
-//    fun insertAndGetNight() {
-//        val night = SleepNight()
-//        sleepDao.insert(night)
-//        val tonight = sleepDao.getTonight()
-//        assertEquals(tonight?.sleepQuality, -1)
-//    }
-//}
-//
-//
+import android.util.Log
+import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.example.android.trackmysleepquality.database.SleepDatabase
+import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+import com.example.android.trackmysleepquality.database.SleepNight
+import org.junit.After
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.io.IOException
+
+/**
+ * This is not meant to be a full set of tests. For simplicity, most of your samples do not
+ * include tests. However, when building the Room, it is helpful to make sure it works before
+ * adding the UI.
+ */
+
+@RunWith(AndroidJUnit4::class)
+class SleepDatabaseTest {
+
+    private lateinit var sleepDao: SleepDatabaseDao
+    private lateinit var db: SleepDatabase
+
+    private val TAG = "TEST1"
+
+    @Before
+    fun createDb() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        // Using an in-memory database because the information stored here disappears when the
+        // process is killed.
+        db = Room.inMemoryDatabaseBuilder(context, SleepDatabase::class.java)
+                // Allowing main thread queries, just for testing.
+                .allowMainThreadQueries()
+                .build()
+        sleepDao = db.sleepDatabaseDao
+    }
+
+    @After
+    @Throws(IOException::class)
+    fun closeDb() {
+        db.close()
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun insertAndGetNight() {
+        val night = SleepNight()
+        sleepDao.insert(night)
+        val tonight = sleepDao.getTonight()
+        assertEquals(tonight?.sleepQuality, -1)
+    }
+
+
+    /**
+     * We have no nights, but try to get the latest night. The result must be null.
+     */
+    @Test
+    fun getNightError() {
+        val tonight = sleepDao.getTonight()
+        assertNull(tonight)
+    }
+
+
+    /**
+     * I wanted to test: insert a night, then get all nights and check if the size of the result
+     * list is exactly 1. Unfortunately, the list is null. Maybe has something to do with the
+     * live data.
+     */
+    @Test
+    fun insertAndGetAllNights() {
+        val night = SleepNight()
+        sleepDao.insert(night)
+
+        val allNights = sleepDao.getAllNights()
+
+
+        val value = allNights.value
+        if (value == null) {
+            Log.i(TAG, "allNights is null")
+        } else {
+            Log.i(TAG, "allNights is not null, the size is ${value.size}")
+        }
+    }
+
+    @Test
+    fun updateAndGetNight() {
+        sleepDao.insert(SleepNight(sleepQuality = 3))
+        val tonight = sleepDao.getTonight()
+
+        assertNotNull(tonight)
+        if (tonight != null) {
+            assertEquals(3, tonight.sleepQuality)
+
+            tonight.sleepQuality = 0
+            assertEquals(0, tonight.sleepQuality)
+        }
+    }
+}
