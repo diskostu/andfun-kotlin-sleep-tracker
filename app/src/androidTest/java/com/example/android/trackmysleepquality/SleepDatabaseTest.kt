@@ -123,15 +123,16 @@ class SleepDatabaseTest {
     }
 
 
+    /**
+     * We insert 1 item and assure the tonight is not null. Then we clear the database and assure
+     * afterwards that tonight is null.
+     */
     @Test
     fun clearAndGet() {
-        val night = SleepNight()
-        sleepDao.insert(night)
-        var tonight = sleepDao.getTonight()
-        assertNotNull(tonight)
+        sleepDao.insert(SleepNight())
+        assertNotNull(sleepDao.getTonight())
 
         sleepDao.clear()
-        tonight = sleepDao.getTonight()
-        assertNull(tonight)
+        assertNull(sleepDao.getTonight())
     }
 }
