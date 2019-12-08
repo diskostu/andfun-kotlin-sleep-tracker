@@ -86,28 +86,6 @@ class SleepDatabaseTest {
     }
 
 
-    /**
-     * I wanted to test: insert a night, then get all nights and check if the size of the result
-     * list is exactly 1. Unfortunately, the list is null. Maybe has something to do with the
-     * live data.
-     */
-    @Test
-    fun insertAndGetAllNights() {
-        val night = SleepNight()
-        sleepDao.insert(night)
-
-        val allNights = sleepDao.getAllNights()
-
-
-        val value = allNights.value
-        if (value == null) {
-            Log.i(TAG, "allNights is null")
-        } else {
-            Log.i(TAG, "allNights is not null, the size is ${value.size}")
-        }
-    }
-
-
     @Test
     fun updateAndGetNight() {
         sleepDao.insert(SleepNight(sleepQuality = 3))
